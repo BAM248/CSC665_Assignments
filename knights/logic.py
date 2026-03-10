@@ -221,6 +221,46 @@ class Biconditional(Sentence):
     def symbols(self):
         return set.union(self.left.symbols(), self.right.symbols())
 
+class Xor(Sentence):
+    def __init__(self,left,right):
+        Sentence.validate(left)
+        Sentence.validate(right)
+        self.left = left
+        self.right = right
+
+
+    def __hash__(self):
+        return hash(("xor", hash(self.left), hash(self.right)))
+    
+    def __repr__(self):
+        return f"xor({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (isinstance(other, Xor)
+                and self.left == other.left
+                and self.right == other.right)
+    
+    #evaluate needs to return left != right (exactly one true) 
+    #for rule to actually work
+    # we can do this recursively  
+    def evaluate(self,model):
+        left = self.left.evaluate(model)
+        right = self.right.evaluate(model)
+        #return eval not equal to other eval
+        return left != right
+
+    # not really sure how to get the xor symbol on here we may need to fix this 
+
+    def formula(self):
+        left = Sentence.parenthesize(str(self.left))
+        right = Sentence.parenthesize(str(self.right))
+        return f"{left} xor {right}"
+    
+    def symbols(self):
+        return set.union(self.left.symbols(), self.right.symbols())
+
+    
+
 
 def model_check(knowledge, query):
     """Checks if knowledge base entails query."""
