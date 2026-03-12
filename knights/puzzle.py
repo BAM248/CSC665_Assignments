@@ -13,14 +13,23 @@ BKnave = Symbol("B is a Knave")
 CKnight = Symbol("C is a Knight")
 CKnave = Symbol("C is a Knave")
 
+# auxiliary symbols for puzzle 3 (what A actually said)
+ASaidKnight = Symbol("A said 'I am a knight'")
+ASaidKnave = Symbol("A said 'I am a knave'")
+
 # Puzzle 1
 # A says "I am both a knight and a knave."
 # ----------------------------------------
 ##   write the statement(s) in PL 
-stat = None
+# Statement from A
+statement1 = And(AKnight, AKnave)
 ##   Fill in the knowledge base
 knowledge1 = And(
-    # TODO
+    # A must be either a knight or a knave (but not both)
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    # knights tell the truth, knaves lie
+    Biconditional(AKnight, statement1)
 )
 # ----------------------------------------
 
@@ -29,10 +38,20 @@ knowledge1 = And(
 # B says "We are of different kinds."
 # ----------------------------------------
 ##   write the statement(s) in PL 
-stat = None
+# A's statement: the two are same kind
+statementA2 = Biconditional(AKnight, BKnight)
+# B's statement: the two are different kinds
+statementB2 = Xor(AKnight, BKnight)
 ##   Fill in the knowledge base
 knowledge2 = And(
-    # TODO
+    # each person is either knight or knave, but not both
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    Or(BKnight, BKnave),
+    Not(And(BKnight, BKnave)),
+    # honesty constraints
+    Biconditional(AKnight, statementA2),
+    Biconditional(BKnight, statementB2)
 )
 # ----------------------------------------
 
@@ -43,10 +62,37 @@ knowledge2 = And(
 # C says "A is a knight."
 # ----------------------------------------
 ##   write the statement(s) in PL 
-stat = None
+# we introduce auxiliary symbols to record what A actually said
+# (only one of these will be true)
+
+# Expression representing what A said as a formula
+statementA3 = Or(And(ASaidKnight, AKnight), And(ASaidKnave, AKnave))
+
+# B's combined statement (both parts together):
+#   "A said 'I am a knave'" AND "C is a knave"
+statementB3 = And(ASaidKnave, CKnave)
+
+# C's statement
+statementC3 = AKnight
+
 ##   Fill in the knowledge base
 knowledge3 = And(
-    # TODO
+    # each person is either a knight or a knave
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    Or(BKnight, BKnave),
+    Not(And(BKnight, BKnave)),
+    Or(CKnight, CKnave),
+    Not(And(CKnight, CKnave)),
+
+    # exactly one of the auxiliary statements is true
+    Or(ASaidKnight, ASaidKnave),
+    Not(And(ASaidKnight, ASaidKnave)),
+
+    # honesty constraints linking each person to their statements
+    Biconditional(AKnight, statementA3),
+    Biconditional(BKnight, statementB3),
+    Biconditional(CKnight, statementC3)
 )
 # ----------------------------------------
 
